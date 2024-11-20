@@ -7,7 +7,8 @@
 using namespace std;
 
 void optimalPageReplacement(int pages[], int n, int capacity) {
-    vector<int> frame(capacity, -1);
+    int frame[capacity];
+    fill(frame, frame + capacity, -1);
     int pageFaults = 0;
 
     for (int i = 0; i < n; i++) {
@@ -35,6 +36,7 @@ void optimalPageReplacement(int pages[], int n, int capacity) {
 
             if (!placed) {
                 int farthestIndex = -1, pageToReplace = -1;
+
                 for (int j = 0; j < capacity; j++) {
                     bool foundInFuture = false;
                     for (int k = i + 1; k < n; k++) {
@@ -44,6 +46,7 @@ void optimalPageReplacement(int pages[], int n, int capacity) {
                             break;
                         }
                     }
+
                     if (!foundInFuture) {
                         pageToReplace = j;
                         break;
@@ -63,6 +66,7 @@ void optimalPageReplacement(int pages[], int n, int capacity) {
 
     cout << "Optimal Page Faults: " << pageFaults << endl;
 }
+
 
 void fifoPageReplacement(int pages[], int n, int capacity) {
     queue<int> fifoQueue;
