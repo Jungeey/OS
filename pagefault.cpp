@@ -1,20 +1,22 @@
 #include <iostream>
-#include <vector>
-#include <algorithm>
 #include <queue>
-#include <unordered_map>
+#include <algorithm>
+#include <map>
 
 using namespace std;
 
 void optimalPageReplacement(int pages[], int n, int capacity) {
     int frame[capacity];
-    fill(frame, frame + capacity, -1);
+    for (int i = 0; i < capacity; i++) {
+        frame[i] = -1; // Initialize frame with -1
+    }
     int pageFaults = 0;
 
     for (int i = 0; i < n; i++) {
         int currentPage = pages[i];
         bool pageFound = false;
 
+        // Check if page is already in the frame
         for (int j = 0; j < capacity; j++) {
             if (frame[j] == currentPage) {
                 pageFound = true;
@@ -23,9 +25,10 @@ void optimalPageReplacement(int pages[], int n, int capacity) {
         }
 
         if (!pageFound) {
-            pageFaults++;
+            pageFaults++; // Increment page faults
 
             bool placed = false;
+            // Place the page in an empty frame if available
             for (int j = 0; j < capacity; j++) {
                 if (frame[j] == -1) {
                     frame[j] = currentPage;
@@ -34,7 +37,7 @@ void optimalPageReplacement(int pages[], int n, int capacity) {
                 }
             }
 
-            if (!placed) {
+            if (!placed) { // If no space, replace the farthest page
                 int farthestIndex = -1, pageToReplace = -1;
 
                 for (int j = 0; j < capacity; j++) {
@@ -53,13 +56,17 @@ void optimalPageReplacement(int pages[], int n, int capacity) {
                     }
                 }
 
-                frame[pageToReplace] = currentPage;
+                frame[pageToReplace] = currentPage; // Replace the farthest page
             }
         }
 
+        // Display the current frame
         cout << "Frame: ";
         for (int j = 0; j < capacity; j++) {
-            cout << (frame[j] == -1 ? " " : to_string(frame[j])) << " ";
+            if (frame[j] == -1)
+                cout << " ";
+            else
+                cout << frame[j] << " ";
         }
         cout << endl;
     }
@@ -69,13 +76,13 @@ void optimalPageReplacement(int pages[], int n, int capacity) {
 
 void fifoPageReplacement(int pages[], int n, int capacity) {
     queue<int> fifoQueue;
-    unordered_map<int, bool> frame;
+    map<int, bool> frame;  // Using map instead of unordered_map for compatibility
     int pageFaults = 0;
 
     for (int i = 0; i < n; i++) {
         int currentPage = pages[i];
-        if (frame.find(currentPage) == frame.end()) {
-            pageFaults++;
+        if (frame.find(currentPage) == frame.end()) { // Page not found in frame
+            pageFaults++; // Increment page faults
 
             if (fifoQueue.size() < capacity) {
                 fifoQueue.push(currentPage);
@@ -89,6 +96,7 @@ void fifoPageReplacement(int pages[], int n, int capacity) {
             }
         }
 
+        // Display the current frame
         cout << "Frame: ";
         queue<int> tempQueue = fifoQueue;
         while (!tempQueue.empty()) {
@@ -102,37 +110,38 @@ void fifoPageReplacement(int pages[], int n, int capacity) {
 }
 
 void lruPageReplacement(int pages[], int n, int capacity) {
-    unordered_map<int, int> pageMap;
+    map<int, int> pageMap;  // Using map instead of unordered_map for compatibility
     int pageFaults = 0;
     int time = 0;
 
     for (int i = 0; i < n; i++) {
         int currentPage = pages[i];
-        if (pageMap.find(currentPage) == pageMap.end()) {
-            pageFaults++;
+        if (pageMap.find(currentPage) == pageMap.end()) { // Page not found in frame
+            pageFaults++; // Increment page faults
 
-            if (pageMap.size() == capacity) {
+            if (pageMap.size() == capacity) { // If frame is full, remove LRU
                 int lruPage = -1, lruTime = time;
-                for (auto &entry : pageMap) {
-                    if (entry.second < lruTime) {
-                        lruTime = entry.second;
-                        lruPage = entry.first;
+                for (map<int, int>::iterator it = pageMap.begin(); it != pageMap.end(); ++it) {
+                    if (it->second < lruTime) {
+                        lruTime = it->second;
+                        lruPage = it->first;
                     }
                 }
-                pageMap.erase(lruPage);
+                pageMap.erase(lruPage); // Remove the LRU page
             }
-            pageMap[currentPage] = time;
+            pageMap[currentPage] = time; // Insert new page
         } else {
-            pageMap[currentPage] = time;
+            pageMap[currentPage] = time; // Update page position
         }
 
+        // Display the current frame
         cout << "Frame: ";
-        for (auto &entry : pageMap) {
-            cout << entry.first << " ";
+        for (map<int, int>::iterator it = pageMap.begin(); it != pageMap.end(); ++it) {
+            cout << it->first << " ";
         }
         cout << endl;
 
-        time++;
+        time++; // Increment time for LRU
     }
 
     cout << "LRU Page Faults: " << pageFaults << endl;
