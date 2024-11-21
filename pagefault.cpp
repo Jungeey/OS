@@ -67,7 +67,6 @@ void optimalPageReplacement(int pages[], int n, int capacity) {
     cout << "Optimal Page Faults: " << pageFaults << endl;
 }
 
-
 void fifoPageReplacement(int pages[], int n, int capacity) {
     queue<int> fifoQueue;
     unordered_map<int, bool> frame;
